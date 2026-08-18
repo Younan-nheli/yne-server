@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: yne-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: yne_server
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: change_this_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - yne_pgdata:/var/lib/postgresql/data
+volumes:
+  yne_pgdata:

@@ -1,0 +1,31 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE TABLE IF NOT EXISTS restaurants (
+ id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ name VARCHAR(160) NOT NULL,
+ code VARCHAR(40) UNIQUE NOT NULL,
+ phone VARCHAR(40), address TEXT,
+ active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+ updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS restaurant_users (
+ id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+ username VARCHAR(80) NOT NULL,
+ password_hash TEXT NOT NULL,
+ role VARCHAR(30) NOT NULL DEFAULT 'Admin',
+ active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+ UNIQUE (restaurant_id, username)
+);
+CREATE TABLE IF NOT EXISTS licenses (
+ id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ restaurant_id UUID NOT NULL UNIQUE REFERENCES restaurants(id) ON DELETE CASCADE,
+ license_key VARCHAR(80) UNIQUE NOT NULL,
+ status VARCHAR(20) NOT NULL DEFAULT 'active',
+ starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+ expires_at TIMESTAMPTZ,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+ updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_licenses_key ON licenses(license_key);
